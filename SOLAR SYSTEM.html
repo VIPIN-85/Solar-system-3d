@@ -1,0 +1,1999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OUR SOLAR SYSTEM — Argon High 3D Planetary & Live Earth Intelligence Engine</title>
+  <!-- MediaPipe Hands & Camera Utilities -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --bg: #02040a;
+      --glass: rgba(8, 13, 25, 0.78);
+      --glass-strong: rgba(10, 16, 30, 0.92);
+      --border: rgba(56, 189, 248, 0.24);
+      --border-gold: rgba(251, 191, 36, 0.45);
+      --cyan: #38bdf8;
+      --gold: #fbbf24;
+      --emerald: #10b981;
+      --rose: #f43f5e;
+      --violet: #a855f7;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+      color: var(--text);
+    }
+    canvas {
+      display: block;
+    }
+
+    /* ==================== TOP ARGON HIGH TELEMETRY BAR ==================== */
+    #top-bar {
+      position: fixed;
+      top: 12px;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      z-index: 30;
+      pointer-events: none;
+    }
+    .argon-pill {
+      pointer-events: auto;
+      background: var(--glass);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 8px 14px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.65);
+    }
+    .project-brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      background: linear-gradient(90deg, #38bdf8, #fbbf24);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--emerald);
+      box-shadow: 0 0 10px var(--emerald);
+      animation: pulseGlow 2s infinite;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.45; transform: scale(1.25); }
+    }
+    .telemetry-tag {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      color: var(--gold);
+      background: rgba(251, 191, 36, 0.1);
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      padding: 4px 9px;
+      border-radius: 999px;
+    }
+
+    /* Search & Voice Command Bar */
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 999px;
+      padding: 3px 6px 3px 12px;
+    }
+    .search-box input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 12px;
+      width: 185px;
+      user-select: text;
+    }
+    .search-box input::placeholder {
+      color: var(--muted);
+    }
+
+    .btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: var(--text);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.18s ease;
+      letter-spacing: 0.03em;
+    }
+    .btn:hover, .btn.active {
+      background: rgba(56, 189, 248, 0.22);
+      border-color: var(--cyan);
+      color: #fff;
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.35);
+    }
+    .btn.voice-btn {
+      border-color: var(--rose);
+      color: #fda4af;
+    }
+    .btn.voice-btn.listening {
+      background: var(--rose);
+      color: #fff;
+      box-shadow: 0 0 18px rgba(244, 63, 94, 0.75);
+      animation: pulseGlow 1s infinite;
+    }
+    .btn.explore-cta {
+      background: linear-gradient(135deg, #f59e0b, #ea580c);
+      border-color: #fde047;
+      color: #02040a;
+      font-weight: 800;
+    }
+    .btn.explore-cta:hover {
+      filter: brightness(1.12);
+      box-shadow: 0 0 18px rgba(251, 191, 36, 0.6);
+    }
+
+    /* ==================== SOLAR SYSTEM PLANET DOCK ==================== */
+    #planet-ribbon {
+      position: fixed;
+      top: 66px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 28;
+      padding: 6px 10px;
+      border-radius: 999px;
+      max-width: 96vw;
+      overflow-x: auto;
+    }
+    .planet-chip {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #cbd5e1;
+      padding: 5px 11px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      transition: all 0.18s ease;
+    }
+    .planet-chip:hover, .planet-chip.active {
+      background: rgba(56, 189, 248, 0.22);
+      border-color: var(--cyan);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+    .p-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    /* ==================== SIDEWAYS AI EXPLORE & FOLLOW-UP DRAWER ==================== */
+    #ai-drawer {
+      position: fixed;
+      top: 116px;
+      left: 16px;
+      bottom: 84px;
+      width: 410px;
+      max-width: calc(100vw - 32px);
+      background: var(--glass-strong);
+      border: 1.5px solid var(--border);
+      border-radius: 18px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 35;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85);
+      transform: translateX(-450px);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #ai-drawer.open {
+      transform: translateX(0);
+    }
+    .drawer-header {
+      padding: 12px 16px;
+      background: linear-gradient(90deg, rgba(56, 189, 248, 0.16), rgba(251, 191, 36, 0.1));
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .drawer-header h3 {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--cyan);
+    }
+    .drawer-close {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: #fff;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .drawer-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .drawer-scroll::-webkit-scrollbar {
+      width: 5px;
+    }
+    .drawer-scroll::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 999px;
+    }
+
+    .target-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.25;
+    }
+    .target-sub {
+      font-family: monospace;
+      font-size: 11px;
+      color: var(--gold);
+      margin-top: 2px;
+    }
+
+    /* Live Weather & Planetary Telemetry Grid */
+    .telemetry-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    .t-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      padding: 8px 10px;
+      border-radius: 10px;
+    }
+    .t-card .k {
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .t-card .v {
+      font-size: 13px;
+      font-weight: 800;
+      color: #f8fafc;
+      margin-top: 2px;
+      font-family: monospace;
+    }
+
+    /* Satellite / Street Map Frame */
+    .sat-box {
+      width: 100%;
+      height: 175px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      background: #050811;
+      flex-shrink: 0;
+    }
+    #sat-iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    /* AI Description & Follow-Up Chat Thread */
+    .ai-thread {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .ai-msg {
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 12.5px;
+      line-height: 1.55;
+      user-select: text;
+    }
+    .ai-msg.assistant {
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      color: #e2e8f0;
+    }
+    .ai-msg.user {
+      background: rgba(251, 191, 36, 0.14);
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      color: #fef08a;
+      align-self: flex-end;
+      max-width: 88%;
+    }
+    .quick-prompts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    .q-chip {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #cbd5e1;
+      font-size: 10px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+    .q-chip:hover {
+      border-color: var(--cyan);
+      color: #fff;
+    }
+
+    .followup-bar {
+      padding: 10px 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      gap: 6px;
+      background: rgba(5, 9, 18, 0.9);
+    }
+    .followup-bar input {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 999px;
+      padding: 7px 13px;
+      color: #fff;
+      font-size: 12px;
+      outline: none;
+      user-select: text;
+    }
+
+    /* ==================== MEDIAPIPE HAND TRACKING PIP ==================== */
+    #hand-pip {
+      position: fixed;
+      top: 116px;
+      right: 16px;
+      width: 235px;
+      background: var(--glass-strong);
+      border: 1.5px solid var(--emerald);
+      border-radius: 14px;
+      overflow: hidden;
+      z-index: 30;
+      display: none;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.8);
+    }
+    #hand-pip.open {
+      display: block;
+    }
+    .pip-title {
+      padding: 6px 10px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      color: #6ee7b7;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+    }
+    #hand-canvas {
+      width: 235px;
+      height: 155px;
+      display: block;
+      background: #020408;
+      transform: scaleX(-1);
+    }
+    #webcam-video {
+      display: none;
+    }
+    .pip-info {
+      padding: 6px 10px;
+      font-family: monospace;
+      font-size: 10px;
+      color: #cbd5e1;
+      line-height: 1.4;
+    }
+
+    /* ==================== BOTTOM CONTROLS & VIPIN SIGNATURE ==================== */
+    #bottom-dock {
+      position: fixed;
+      bottom: 34px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      z-index: 30;
+      padding: 8px 18px;
+      max-width: 96vw;
+    }
+    .ctrl-item {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 120px;
+    }
+    .ctrl-item label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .ctrl-item label b {
+      color: var(--cyan);
+      font-family: monospace;
+    }
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: var(--cyan);
+      cursor: pointer;
+      box-shadow: 0 0 8px var(--cyan);
+    }
+
+    #vipin-footer {
+      position: fixed;
+      bottom: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #e2e8f0;
+      background: rgba(8, 13, 25, 0.72);
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      padding: 4px 18px;
+      border-radius: 999px;
+      z-index: 30;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+      white-space: nowrap;
+    }
+    #vipin-footer span {
+      color: var(--gold);
+    }
+
+    #toast-banner {
+      position: fixed;
+      top: 118px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(10, 16, 30, 0.92);
+      border: 1.5px solid var(--gold);
+      color: #fef08a;
+      padding: 7px 18px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      z-index: 40;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== TOP ARGON HIGH TELEMETRY BAR ==================== -->
+  <div id="top-bar">
+    <div class="argon-pill">
+      <div class="live-dot"></div>
+      <span class="project-brand">🌌 OUR SOLAR SYSTEM</span>
+      <span class="telemetry-tag" id="utcClockTag">LIVE UTC SOLAR LOCK</span>
+      <span class="telemetry-tag" id="activeBodyTag">EARTH (29.78 km/s)</span>
+    </div>
+
+    <div class="argon-pill">
+      <div class="search-box">
+        <input id="placeSearchInput" type="text" placeholder="Say or type city, place, or planet..." />
+        <button class="btn" onclick="runPlaceOrPlanetSearch()">Go</button>
+      </div>
+      <button class="btn voice-btn" id="voiceNavBtn" onclick="triggerVoiceNavigation()">🎙️ Voice Assist</button>
+      <button class="btn explore-cta" onclick="openExploreDrawer()">🔭 Explore</button>
+      <button class="btn" id="handBtn" onclick="toggleHandGestures()">🖐️ Hand Control</button>
+      <button class="btn" id="ttsBtn" onclick="toggleVoiceReadout()">🔊 AI Voice: ON</button>
+    </div>
+  </div>
+
+  <!-- ==================== SOLAR SYSTEM PLANET RIBBON (SUN + 8 PLANETS + MOON) ==================== -->
+  <div id="planet-ribbon" class="argon-pill">
+    <button class="planet-chip" onclick="selectCelestialBody('sun')"><span class="p-dot" style="background:#fbbf24;box-shadow:0 0 8px #fbbf24"></span>Sun</button>
+    <button class="planet-chip" onclick="selectCelestialBody('mercury')"><span class="p-dot" style="background:#a8a29e"></span>Mercury</button>
+    <button class="planet-chip" onclick="selectCelestialBody('venus')"><span class="p-dot" style="background:#fde68a"></span>Venus</button>
+    <button class="planet-chip active" onclick="selectCelestialBody('earth')"><span class="p-dot" style="background:#38bdf8"></span>Earth</button>
+    <button class="planet-chip" onclick="selectCelestialBody('moon')"><span class="p-dot" style="background:#cbd5e1"></span>Moon</button>
+    <button class="planet-chip" onclick="selectCelestialBody('mars')"><span class="p-dot" style="background:#ef4444"></span>Mars</button>
+    <button class="planet-chip" onclick="selectCelestialBody('jupiter')"><span class="p-dot" style="background:#f59e0b"></span>Jupiter</button>
+    <button class="planet-chip" onclick="selectCelestialBody('saturn')"><span class="p-dot" style="background:#fcd34d"></span>Saturn</button>
+    <button class="planet-chip" onclick="selectCelestialBody('uranus')"><span class="p-dot" style="background:#67e8f9"></span>Uranus</button>
+    <button class="planet-chip" onclick="selectCelestialBody('neptune')"><span class="p-dot" style="background:#3b82f6"></span>Neptune</button>
+  </div>
+
+  <div id="toast-banner">🎙️ Listening... Say any city, landmark, or planet!</div>
+
+  <!-- ==================== SIDEWAYS AI EXPLORE & FOLLOW-UP DRAWER ==================== -->
+  <div id="ai-drawer">
+    <div class="drawer-header">
+      <h3 id="drawerHeading">🔭 AI Planetary &amp; Place Intelligence</h3>
+      <button class="drawer-close" onclick="closeExploreDrawer()">✕</button>
+    </div>
+
+    <div class="drawer-scroll" id="drawerScroll">
+      <div>
+        <div class="target-title" id="exploreTitle">Earth — Real-Time Planetary Twin</div>
+        <div class="target-sub" id="exploreCoords">LAT: 28.6139° N, LON: 77.2090° E • Live Solar Lock</div>
+      </div>
+
+      <!-- 4-Card Live Weather / Orbital Telemetry Grid -->
+      <div class="telemetry-grid">
+        <div class="t-card">
+          <div class="k" id="metaLabel1">Orbital Velocity</div>
+          <div class="v" id="metaVal1">29.78 km/s</div>
+        </div>
+        <div class="t-card">
+          <div class="k" id="metaLabel2">Live Weather / Temp</div>
+          <div class="v" id="metaVal2">Fetching Live...</div>
+        </div>
+        <div class="t-card">
+          <div class="k" id="metaLabel3">Equatorial Radius</div>
+          <div class="v" id="metaVal3">6,371.0 km</div>
+        </div>
+        <div class="t-card">
+          <div class="k" id="metaLabel4">Wind / Atmosphere</div>
+          <div class="v" id="metaVal4">N₂ 78%, O₂ 21%</div>
+        </div>
+      </div>
+
+      <!-- Embedded High-Res Google Satellite / Street View Lens (No Blur on Close Zoom!) -->
+      <div class="sat-box" id="satBox">
+        <iframe id="sat-iframe" loading="lazy" allowfullscreen
+          src="https://maps.google.com/maps?q=28.6139,77.2090&t=k&z=15&output=embed"></iframe>
+      </div>
+
+      <div style="display:flex; gap:6px;">
+        <a id="extGoogleEarth" class="btn" style="flex:1; justify-content:center; text-decoration:none;"
+           href="https://earth.google.com/web/@28.6139,77.2090,300a,2500d,35y,0h,45t,0r" target="_blank" rel="noopener noreferrer">
+          🌍 3D Google Earth
+        </a>
+        <a id="extStreetView" class="btn" style="flex:1; justify-content:center; text-decoration:none;"
+           href="https://www.google.com/maps?q=28.6139,77.2090&t=k" target="_blank" rel="noopener noreferrer">
+          🛰️ Full Satellite Map
+        </a>
+      </div>
+
+      <!-- AI Knowledge Thread & Follow-Up Q&A -->
+      <div class="ai-thread" id="aiThread"></div>
+
+      <div class="quick-prompts">
+        <button class="q-chip" onclick="askFollowUp('What is the live weather and local solar condition right now?')">☁️ Live Weather</button>
+        <button class="q-chip" onclick="askFollowUp('Give me the exact physical, orbital, and geological details.')">🪐 Orbital &amp; Physical Specs</button>
+        <button class="q-chip" onclick="askFollowUp('Tell me key historical and geographic highlights of this place.')">🏛️ Geography &amp; History</button>
+      </div>
+    </div>
+
+    <div class="followup-bar">
+      <input id="followUpInput" type="text" placeholder="Ask a follow-up question about this place/planet..." />
+      <button class="btn voice-btn" onclick="triggerFollowUpVoice()" title="Ask by Voice">🎙️</button>
+      <button class="btn explore-cta" onclick="submitFollowUpInput()">Ask</button>
+    </div>
+  </div>
+
+  <!-- ==================== MEDIAPIPE HAND-TRACKING PIP ==================== -->
+  <div id="hand-pip">
+    <div class="pip-title">
+      <span>● MediaPipe Hand Gestures</span>
+      <span id="handGestureBadge">READY</span>
+    </div>
+    <video id="webcam-video" playsinline></video>
+    <canvas id="hand-canvas" width="235" height="155"></canvas>
+    <div class="pip-info" id="handReadout">
+      • <b>Pinch Close</b>: Pull Back to Orbit<br/>
+      • <b>Spread Fingers</b>: Smooth Zoom In<br/>
+      • <b>Move Open Palm</b>: Rotate Planet
+    </div>
+  </div>
+
+  <!-- ==================== BOTTOM DOCK & VIPIN SIGNATURE ==================== -->
+  <div id="bottom-dock" class="argon-pill">
+    <div class="ctrl-item">
+      <label><span>Camera Altitude</span><b id="lblZoom">18.0 u</b></label>
+      <input type="range" id="slZoom" min="6.85" max="160" step="0.05" value="18.0" />
+    </div>
+
+    <div class="ctrl-item">
+      <label><span>Micro-Terrain Sharpness</span><b id="lblSharp">1.25x</b></label>
+      <input type="range" id="slSharp" min="0.0" max="2.0" step="0.05" value="1.25" />
+    </div>
+
+    <div class="ctrl-item">
+      <label><span>Orbit Time Scale</span><b id="lblSpeed">1.0x</b></label>
+      <input type="range" id="slSpeed" min="0.0" max="10.0" step="0.1" value="1.0" />
+    </div>
+
+    <button class="btn active" id="realSunBtn" onclick="toggleRealTimeSun()">🕒 Live Real-World Sun: ON</button>
+    <button class="btn" onclick="flyToPlaceByName('Ambala Cantt, India')">📍 Ambala</button>
+    <button class="btn" onclick="flyToPlaceByName('New Delhi, India')">📍 New Delhi</button>
+    <button class="btn" onclick="flyToPlaceByName('Mount Everest')">📍 Mt. Everest</button>
+  </div>
+
+  <div id="vipin-footer">
+    OUR SOLAR SYSTEM &nbsp;•&nbsp; MADE WITH ❤️ BY <span>VIPIN</span>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    /* =========================================================================
+       1. EXACT PLANETARY ASTROPHYSICAL DATABASE (SUN + 8 PLANETS + MOON)
+       ========================================================================= */
+    const SOLAR_BODIES = {
+      sun: {
+        name: 'The Sun (Sol)',
+        subtitle: 'G2V Main-Sequence Star • Solar System Center',
+        radiusKm: 696340,
+        sceneRadius: 14.5,
+        orbitDistScene: 0,
+        orbitalSpeedKms: 220.0, // Galactic orbit
+        angularSpeed: 0,
+        rotationPeriodHrs: 609.12,
+        tiltDeg: 7.25,
+        distanceAU: '0.000 AU (Center)',
+        gravity: '274.0 m/s² (27.9 g)',
+        atmosphere: 'H₂ 73.4%, He 24.8%, Corona Plasma (5,778 K)',
+        color: '#fbbf24',
+        summary: 'The Sun contains 99.86% of all mass in our Solar System. In its core, 600 million metric tons of hydrogen fuse into helium every second, generating the solar radiation that drives Earth’s climate, weather, and day-night cycle.'
+      },
+      mercury: {
+        name: 'Mercury',
+        subtitle: '1st Planet • Terrestrial Iron-Core World',
+        radiusKm: 2439.7,
+        sceneRadius: 1.8,
+        orbitDistScene: 32,
+        orbitalSpeedKms: 47.36,
+        angularSpeed: 0.0047,
+        rotationPeriodHrs: 1407.6,
+        tiltDeg: 0.03,
+        distanceAU: '0.387 AU (57.9M km)',
+        gravity: '3.70 m/s²',
+        atmosphere: 'Ultra-thin Exosphere (O₂, Na, H₂)',
+        color: '#a8a29e',
+        summary: 'Mercury is the fastest-orbiting planet in the Solar System at 47.36 km/s. It possesses an enormous iron core accounting for ~85% of its radius and experiences temperature swings from -180°C at night to 430°C at noon.'
+      },
+      venus: {
+        name: 'Venus',
+        subtitle: '2nd Planet • Super-Greenhouse Terrestrial World',
+        radiusKm: 6051.8,
+        sceneRadius: 3.9,
+        orbitDistScene: 48,
+        orbitalSpeedKms: 35.02,
+        angularSpeed: 0.0035,
+        rotationPeriodHrs: -5832.5, // Retrograde spin!
+        tiltDeg: 177.36,
+        distanceAU: '0.723 AU (108.2M km)',
+        gravity: '8.87 m/s²',
+        atmosphere: 'CO₂ 96.5%, N₂ 3.5%, Sulfuric Acid Clouds (92 bar)',
+        color: '#fde68a',
+        summary: 'Venus rotates backwards (retrograde) so slowly that a sidereal day on Venus is longer than its year. Its dense 92-bar carbon dioxide atmosphere traps heat via a runaway greenhouse effect, keeping the surface around 465°C.'
+      },
+      earth: {
+        name: 'Earth (Terra)',
+        subtitle: '3rd Planet • Ocean & Biosphere World',
+        radiusKm: 6371.0,
+        sceneRadius: 6.0,
+        orbitDistScene: 72,
+        orbitalSpeedKms: 29.78,
+        angularSpeed: 0.00298,
+        rotationPeriodHrs: 23.934,
+        tiltDeg: 23.44,
+        distanceAU: '1.000 AU (149.6M km)',
+        gravity: '9.807 m/s²',
+        atmosphere: 'N₂ 78.08%, O₂ 20.95%, Ar 0.93%, H₂O Vapor',
+        color: '#38bdf8',
+        summary: 'Earth is our home world, orbiting the Sun at 29.78 km/s with a 23.44° axial tilt that creates the four seasons. Liquid water oceans cover 71% of its crust, protected from solar wind by a dipole magnetosphere.'
+      },
+      moon: {
+        name: 'The Moon (Luna)',
+        subtitle: 'Earth’s Natural Satellite • Tidally Locked',
+        radiusKm: 1737.4,
+        sceneRadius: 1.636, // Exact 0.2727x of Earth's 6.0 sceneRadius
+        orbitDistScene: 16.5, // Relative to Earth
+        orbitalSpeedKms: 1.022,
+        angularSpeed: 0.012,
+        rotationPeriodHrs: 655.7,
+        tiltDeg: 6.68,
+        distanceAU: '384,400 km from Earth',
+        gravity: '1.62 m/s² (0.165 g)',
+        atmosphere: 'Surface-bound Exosphere (Vacuum)',
+        color: '#cbd5e1',
+        summary: 'The Moon has an equatorial radius of 1,737.4 km (0.2727× Earth) and orbits Earth at 1.022 km/s. It is tidally locked, stabilizing Earth’s axial tilt and driving ocean tides across our planet.'
+      },
+      mars: {
+        name: 'Mars',
+        subtitle: '4th Planet • The Red Iron-Oxide World',
+        radiusKm: 3389.5,
+        sceneRadius: 3.2,
+        orbitDistScene: 102,
+        orbitalSpeedKms: 24.07,
+        angularSpeed: 0.0024,
+        rotationPeriodHrs: 24.62,
+        tiltDeg: 25.19,
+        distanceAU: '1.524 AU (227.9M km)',
+        gravity: '3.721 m/s²',
+        atmosphere: 'CO₂ 95.3%, N₂ 2.6%, Ar 1.9%',
+        color: '#ef4444',
+        summary: 'Mars is home to Olympus Mons (the tallest volcano in the Solar System at 21.9 km) and Valles Marineris. Its 24.6-hour solar day (sol) and 25.19° axial tilt closely mirror Earth’s daily and seasonal rhythms.'
+      },
+      jupiter: {
+        name: 'Jupiter',
+        subtitle: '5th Planet • Gas Giant & Great Red Spot',
+        radiusKm: 69911,
+        sceneRadius: 9.8,
+        orbitDistScene: 142,
+        orbitalSpeedKms: 13.07,
+        angularSpeed: 0.0013,
+        rotationPeriodHrs: 9.925, // Fastest spinning planet!
+        tiltDeg: 3.13,
+        distanceAU: '5.204 AU (778.5M km)',
+        gravity: '24.79 m/s²',
+        atmosphere: 'H₂ 89.8%, He 10.2%, NH₃ Clouds',
+        color: '#f59e0b',
+        summary: 'Jupiter is the largest planet in the Solar System and spins once every 9 hours 55 minutes—creating powerful jet streams, zonal ammonia cloud bands, and the Great Red Spot anticyclone.'
+      },
+      saturn: {
+        name: 'Saturn',
+        subtitle: '6th Planet • Ringed Gas Giant',
+        radiusKm: 58232,
+        sceneRadius: 8.4,
+        orbitDistScene: 188,
+        orbitalSpeedKms: 9.68,
+        angularSpeed: 0.00097,
+        rotationPeriodHrs: 10.7,
+        tiltDeg: 26.73,
+        distanceAU: '9.582 AU (1.43B km)',
+        gravity: '10.44 m/s²',
+        atmosphere: 'H₂ 96.3%, He 3.25%, Icy Ring System',
+        color: '#fcd34d',
+        summary: 'Saturn orbits at 9.68 km/s and is famous for its spectacular ring system spanning 282,000 km across, composed of 99% pure water-ice particles ranging from micrometer dust to house-sized boulders.'
+      },
+      uranus: {
+        name: 'Uranus',
+        subtitle: '7th Planet • Sideways-Tilted Ice Giant',
+        radiusKm: 25362,
+        sceneRadius: 5.4,
+        orbitDistScene: 232,
+        orbitalSpeedKms: 6.80,
+        angularSpeed: 0.00068,
+        rotationPeriodHrs: -17.24,
+        tiltDeg: 97.77, // Rolls on its side!
+        distanceAU: '19.20 AU (2.87B km)',
+        gravity: '8.69 m/s²',
+        atmosphere: 'H₂ 82.5%, He 15.2%, CH₄ (Methane) 2.3%',
+        color: '#67e8f9',
+        summary: 'Uranus has an extreme axial tilt of 97.77°, causing it to roll around the Sun on its side. Methane in its upper atmosphere absorbs red light, giving the ice giant its serene aquamarine cyan hue.'
+      },
+      neptune: {
+        name: 'Neptune',
+        subtitle: '8th Planet • Supersonic-Wind Ice Giant',
+        radiusKm: 24622,
+        sceneRadius: 5.2,
+        orbitDistScene: 274,
+        orbitalSpeedKms: 5.43,
+        angularSpeed: 0.00054,
+        rotationPeriodHrs: 16.11,
+        tiltDeg: 28.32,
+        distanceAU: '30.05 AU (4.50B km)',
+        gravity: '11.15 m/s²',
+        atmosphere: 'H₂ 80%, He 19%, CH₄ 1.5% (2,100 km/h winds)',
+        color: '#3b82f6',
+        summary: 'Neptune orbits the Sun at 30.05 AU with an orbital velocity of 5.43 km/s. Despite receiving 900× less sunlight than Earth, internal heat drives the fastest planetary winds in the Solar System—reaching 2,100 km/h.'
+      }
+    };
+
+    /* =========================================================================
+       2. THREE.JS SCENE, ANISOTROPIC RENDERER & STARFIELD
+       ========================================================================= */
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x010308);
+
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.05, 3500);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.15;
+    document.body.appendChild(renderer.domElement);
+
+    const maxAniso = renderer.capabilities.getMaxAnisotropy();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // 7,500 Deep-Space Stars
+    (function createStars() {
+      const geo = new THREE.BufferGeometry();
+      const count = 7500;
+      const pos = new Float32Array(count * 3);
+      const col = new Float32Array(count * 3);
+      for (let i = 0; i < count; i++) {
+        const r = 800 + Math.random() * 900;
+        const theta = Math.acos(2 * Math.random() - 1);
+        const phi = Math.random() * Math.PI * 2;
+        pos[i * 3] = r * Math.sin(theta) * Math.cos(phi);
+        pos[i * 3 + 1] = r * Math.cos(theta);
+        pos[i * 3 + 2] = r * Math.sin(theta) * Math.sin(phi);
+        const c = new THREE.Color().setHSL(0.58 + (Math.random() - 0.5) * 0.25, 0.65, 0.75 + Math.random() * 0.25);
+        col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b;
+      }
+      geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+      scene.add(new THREE.Points(geo, new THREE.PointsMaterial({ size: 1.3, vertexColors: true, transparent: true, opacity: 0.9 })));
+    })();
+
+    const sunPointLight = new THREE.PointLight(0xfffbeb, 2.4, 2500);
+    scene.add(sunPointLight);
+    scene.add(new THREE.AmbientLight(0x1e293b, 0.28));
+
+    /* =========================================================================
+       3. HIGH-RESOLUTION PROCEDURAL PLANETARY TEXTURE SYNTHESIZER + SATELLITE MAPS
+       ========================================================================= */
+    const loader = new THREE.TextureLoader();
+    loader.setCrossOrigin('anonymous');
+
+    function enhanceTex(tex) {
+      tex.anisotropy = maxAniso;
+      tex.minFilter = THREE.LinearMipmapLinearFilter;
+      tex.magFilter = THREE.LinearFilter;
+      return tex;
+    }
+
+    const earthDayTex = enhanceTex(loader.load('https://unpkg.com/three-globe@2.31.1/example/img/earth-blue-marble.jpg'));
+    const earthBumpTex = enhanceTex(loader.load('https://unpkg.com/three-globe@2.31.1/example/img/earth-topology.png'));
+    const earthSpecTex = enhanceTex(loader.load('https://unpkg.com/three-globe@2.31.1/example/img/earth-water.png'));
+    const earthNightTex = enhanceTex(loader.load('https://unpkg.com/three-globe@2.31.1/example/img/earth-night.jpg'));
+    const earthCloudsTex = enhanceTex(loader.load('https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_clouds_1024.png'));
+    const moonTex = enhanceTex(loader.load('https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/moon_1024.jpg'));
+
+    // Procedural High-Detail Banded & Cratered Planet Texture Generator for Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune
+    function generatePlanetTexture(type) {
+      const c = document.createElement('canvas');
+      c.width = 1024;
+      c.height = 512;
+      const g = c.getContext('2d');
+
+      if (type === 'mercury') {
+        g.fillStyle = '#8c8680';
+        g.fillRect(0, 0, 1024, 512);
+        for (let i = 0; i < 600; i++) {
+          const x = Math.random() * 1024, y = Math.random() * 512, r = 2 + Math.pow(Math.random(), 3) * 35;
+          g.fillStyle = i % 2 === 0 ? 'rgba(60,56,52,0.35)' : 'rgba(180,175,168,0.25)';
+          g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill();
+        }
+      } else if (type === 'venus') {
+        const grd = g.createLinearGradient(0, 0, 0, 512);
+        grd.addColorStop(0, '#d97706'); grd.addColorStop(0.5, '#fde68a'); grd.addColorStop(1, '#b45309');
+        g.fillStyle = grd; g.fillRect(0, 0, 1024, 512);
+        for (let y = 0; y < 512; y += 4) {
+          g.fillStyle = `rgba(255, 240, 195, ${0.08 + Math.sin(y * 0.06) * 0.06})`;
+          g.fillRect(0, y, 1024, 3);
+        }
+      } else if (type === 'mars') {
+        const grd = g.createLinearGradient(0, 0, 0, 512);
+        grd.addColorStop(0, '#f8fafc');
+        grd.addColorStop(0.08, '#b91c1c');
+        grd.addColorStop(0.5, '#c2410c');
+        grd.addColorStop(0.92, '#9a3412');
+        grd.addColorStop(1, '#f8fafc');
+        g.fillStyle = grd; g.fillRect(0, 0, 1024, 512);
+        for (let i = 0; i < 400; i++) {
+          g.fillStyle = i % 3 === 0 ? 'rgba(69, 26, 3, 0.28)' : 'rgba(251, 146, 60, 0.2)';
+          g.beginPath();
+          g.arc(Math.random() * 1024, 40 + Math.random() * 432, 4 + Math.random() * 42, 0, Math.PI * 2);
+          g.fill();
+        }
+      } else if (type === 'jupiter') {
+        const bands = ['#78350f', '#d97706', '#fef3c7', '#b45309', '#f59e0b', '#92400e', '#fde68a', '#78350f'];
+        for (let y = 0; y < 512; y++) {
+          const idx = Math.floor((y / 512) * bands.length * 2.5) % bands.length;
+          g.fillStyle = bands[idx];
+          g.fillRect(0, y, 1024, 2);
+        }
+        // Great Red Spot
+        g.fillStyle = 'rgba(220, 38, 38, 0.85)';
+        g.beginPath(); g.ellipse(620, 330, 52, 32, 0, 0, Math.PI * 2); g.fill();
+      } else if (type === 'saturn') {
+        const grd = g.createLinearGradient(0, 0, 0, 512);
+        grd.addColorStop(0, '#a16207'); grd.addColorStop(0.3, '#fde047');
+        grd.addColorStop(0.5, '#fef9c3'); grd.addColorStop(0.7, '#eab308'); grd.addColorStop(1, '#854d0e');
+        g.fillStyle = grd; g.fillRect(0, 0, 1024, 512);
+      } else if (type === 'uranus') {
+        const grd = g.createLinearGradient(0, 0, 0, 512);
+        grd.addColorStop(0, '#0891b2'); grd.addColorStop(0.5, '#a5f3fc'); grd.addColorStop(1, '#0e7490');
+        g.fillStyle = grd; g.fillRect(0, 0, 1024, 512);
+      } else if (type === 'neptune') {
+        const grd = g.createLinearGradient(0, 0, 0, 512);
+        grd.addColorStop(0, '#1e3a8a'); grd.addColorStop(0.5, '#2563eb'); grd.addColorStop(1, '#172554');
+        g.fillStyle = grd; g.fillRect(0, 0, 1024, 512);
+      }
+      return enhanceTex(new THREE.CanvasTexture(c));
+    }
+
+    /* =========================================================================
+       4. BUILD SUN + ALL 8 PLANETS + MOON WITH SUB-PIXEL SHARP EARTH SHADER
+       ========================================================================= */
+    const planetMeshes = {};
+    const planetGroups = {};
+    const orbitalAngles = {
+      mercury: 0.4,
+      venus: 1.9,
+      earth: 0.0,
+      moon: 0.8,
+      mars: 2.7,
+      jupiter: 4.1,
+      saturn: 5.2,
+      uranus: 3.3,
+      neptune: 1.1
+    };
+
+    // 1. THE SUN (Boiling Procedural GLSL Granulation + Corona Glow)
+    const sunUniforms = { uTime: { value: 0 } };
+    const sunShaderMat = new THREE.ShaderMaterial({
+      uniforms: sunUniforms,
+      vertexShader: `
+        varying vec3 vNormal;
+        varying vec3 vPos;
+        void main() {
+          vNormal = normalize(normalMatrix * normal);
+          vPos = position;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform float uTime;
+        varying vec3 vNormal;
+        varying vec3 vPos;
+
+        float hash(vec3 p) {
+          p = fract(p * 0.3183099 + 0.1);
+          p *= 17.0;
+          return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
+        }
+        float noise(vec3 x) {
+          vec3 i = floor(x), f = fract(x);
+          f = f * f * (3.0 - 2.0 * f);
+          return mix(
+            mix(mix(hash(i+vec3(0,0,0)), hash(i+vec3(1,0,0)), f.x),
+                mix(hash(i+vec3(0,1,0)), hash(i+vec3(1,1,0)), f.x), f.y),
+            mix(mix(hash(i+vec3(0,0,1)), hash(i+vec3(1,0,1)), f.x),
+                mix(hash(i+vec3(0,1,1)), hash(i+vec3(1,1,1)), f.x), f.x), f.z);
+        }
+        void main() {
+          vec3 p = normalize(vPos) * 6.5 + vec3(uTime * 0.35);
+          float n = noise(p) * 0.55 + noise(p * 2.4 - uTime * 0.5) * 0.3 + noise(p * 5.5) * 0.15;
+          vec3 col = mix(vec3(0.95, 0.22, 0.02), vec3(1.0, 0.88, 0.32), smoothstep(0.2, 0.85, n));
+          float rim = pow(1.0 - abs(dot(vNormal, vec3(0.0, 0.0, 1.0))), 2.0);
+          col += vec3(1.0, 0.65, 0.15) * rim * 0.9;
+          gl_FragColor = vec4(col, 1.0);
+        }
+      `
+    });
+    const sunGroup = new THREE.Group();
+    const sunMesh = new THREE.Mesh(new THREE.SphereGeometry(SOLAR_BODIES.sun.sceneRadius, 64, 64), sunShaderMat);
+    // Solar Corona Halo
+    const sunHalo = new THREE.Mesh(
+      new THREE.SphereGeometry(SOLAR_BODIES.sun.sceneRadius * 1.25, 48, 48),
+      new THREE.MeshBasicMaterial({ color: 0xf59e0b, transparent: true, opacity: 0.22, side: THREE.BackSide, blending: THREE.AdditiveBlending })
+    );
+    sunGroup.add(sunMesh, sunHalo);
+    scene.add(sunGroup);
+    planetMeshes.sun = sunMesh;
+    planetGroups.sun = sunGroup;
+
+    // 2. EARTH WITH SUB-PIXEL PROCEDURAL DETAIL SHADER (FIXES CLOSE-UP ZOOM BLUR!)
+    const earthUniforms = {
+      uDayTex: { value: earthDayTex },
+      uNightTex: { value: earthNightTex },
+      uSpecTex: { value: earthSpecTex },
+      uBumpTex: { value: earthBumpTex },
+      uSunDir: { value: new THREE.Vector3(1, 0, 0) },
+      uCamDist: { value: 18.0 },
+      uDetailStrength: { value: 1.25 }
+    };
+
+    const earthShaderMat = new THREE.ShaderMaterial({
+      uniforms: earthUniforms,
+      vertexShader: `
+        varying vec2 vUv;
+        varying vec3 vWorldNormal;
+        varying vec3 vWorldPos;
+        varying vec3 vLocalPos;
+        void main() {
+          vUv = uv;
+          vLocalPos = position;
+          vec4 wp = modelMatrix * vec4(position, 1.0);
+          vWorldPos = wp.xyz;
+          vWorldNormal = normalize(mat3(modelMatrix) * normal);
+          gl_Position = projectionMatrix * viewMatrix * wp;
+        }
+      `,
+      fragmentShader: `
+        uniform sampler2D uDayTex;
+        uniform sampler2D uNightTex;
+        uniform sampler2D uSpecTex;
+        uniform sampler2D uBumpTex;
+        uniform vec3 uSunDir;
+        uniform float uCamDist;
+        uniform float uDetailStrength;
+
+        varying vec2 vUv;
+        varying vec3 vWorldNormal;
+        varying vec3 vWorldPos;
+        varying vec3 vLocalPos;
+
+        // 3D Procedural Fractal Brownian Motion (FBM) for ultra-crisp sub-pixel detail when zoomed in!
+        float hash(vec3 p) {
+          p = fract(p * 0.1031);
+          p += dot(p, p.yzx + 33.33);
+          return fract((p.x + p.y) * p.z);
+        }
+        float vnoise(vec3 x) {
+          vec3 i = floor(x), f = fract(x);
+          f = f * f * (3.0 - 2.0 * f);
+          return mix(
+            mix(mix(hash(i+vec3(0,0,0)), hash(i+vec3(1,0,0)), f.x),
+                mix(hash(i+vec3(0,1,0)), hash(i+vec3(1,1,0)), f.x), f.y),
+            mix(mix(hash(i+vec3(0,0,1)), hash(i+vec3(1,0,1)), f.x),
+                mix(hash(i+vec3(0,1,1)), hash(i+vec3(1,1,1)), f.x), f.y), f.z);
+        }
+        float fbm(vec3 p) {
+          float v = 0.0, a = 0.5;
+          for (int i = 0; i < 5; i++) {
+            v += a * vnoise(p);
+            p *= 2.15;
+            a *= 0.5;
+          }
+          return v;
+        }
+
+        void main() {
+          vec3 viewDir = normalize(cameraPosition - vWorldPos);
+
+          // Calculate how close the camera is to the surface to blend sub-pixel micro-terrain
+          float closeZoomFactor = clamp((16.0 - uCamDist) / 9.0, 0.0, 1.0) * uDetailStrength;
+
+          // Multi-scale procedural FBM evaluated on 3D sphere coordinates (zero UV seam distortion!)
+          float microDetail = fbm(vLocalPos * 28.0) * 0.65 + fbm(vLocalPos * 95.0) * 0.35;
+          float microGradX = fbm((vLocalPos + vec3(0.002, 0.0, 0.0)) * 65.0) - microDetail;
+          float microGradY = fbm((vLocalPos + vec3(0.0, 0.002, 0.0)) * 65.0) - microDetail;
+
+          // Base satellite bump + procedural micro-normal relief
+          vec2 texStep = vec2(1.0 / 2048.0, 1.0 / 1024.0);
+          float hC = texture2D(uBumpTex, vUv).r;
+          float hU = texture2D(uBumpTex, vUv + vec2(texStep.x, 0.0)).r;
+          float hV = texture2D(uBumpTex, vUv + vec2(0.0, texStep.y)).r;
+
+          vec3 bumpOffset = vec3(hC - hU, hC - hV, 0.0) * 1.85;
+          bumpOffset += vec3(microGradX, microGradY, 0.0) * closeZoomFactor * 0.95;
+
+          vec3 n = normalize(vWorldNormal + bumpOffset);
+
+          // Crisp Coastline & Land/Water Discrimination when zoomed close
+          float rawWater = texture2D(uSpecTex, vUv).r;
+          float sharpWater = smoothstep(0.42, 0.58, rawWater + (microDetail - 0.5) * 0.14 * closeZoomFactor);
+
+          vec3 dayCol = texture2D(uDayTex, vUv).rgb;
+          // Inject fine mineral, forest, and desert grain on land when zoomed close so pixels never look blurry!
+          vec3 landGrain = dayCol * (0.82 + microDetail * 0.36);
+          vec3 oceanMicroWaves = mix(dayCol, vec3(0.03, 0.18, 0.34), 0.25 * closeZoomFactor) + (microDetail - 0.5) * 0.04 * closeZoomFactor;
+          dayCol = mix(landGrain, oceanMicroWaves, sharpWater);
+
+          vec3 nightCol = texture2D(uNightTex, vUv).rgb;
+
+          float sunDot = dot(n, uSunDir);
+          float dayFactor = smoothstep(-0.16, 0.22, sunDot);
+          float twilight = smoothstep(-0.22, 0.04, sunDot) * (1.0 - smoothstep(0.04, 0.30, sunDot));
+
+          float diff = max(sunDot, 0.0);
+          vec3 litDay = dayCol * (0.09 + diff * 1.25);
+
+          // Crisp Specular Ocean Reflection
+          vec3 halfVec = normalize(uSunDir + viewDir);
+          float spec = pow(max(dot(n, halfVec), 0.0), 56.0) * sharpWater * diff;
+          litDay += vec3(1.0, 0.93, 0.80) * spec * 0.8;
+          litDay += vec3(0.96, 0.40, 0.14) * twilight * 0.38;
+
+          // Night-side glowing urban lights
+          vec3 cities = pow(nightCol, vec3(1.3)) * vec3(1.35, 1.05, 0.65) * 1.45;
+          vec3 darkSide = dayCol * 0.025 + cities * (1.0 - dayFactor);
+
+          vec3 finalCol = mix(darkSide, litDay, dayFactor);
+
+          // Rayleigh Atmospheric Fresnel Rim
+          float rim = pow(1.0 - max(dot(viewDir, vWorldNormal), 0.0), 3.2);
+          finalCol += vec3(0.22, 0.60, 0.98) * rim * clamp(sunDot + 0.35, 0.06, 1.0) * 0.48;
+
+          gl_FragColor = vec4(finalCol, 1.0);
+        }
+      `
+    });
+
+    // Helper to build orbital track lines
+    function addOrbitCircle(radius, colorHex = 0x38bdf8, parent = scene) {
+      const pts = [];
+      for (let i = 0; i <= 160; i++) {
+        const a = (i / 160) * Math.PI * 2;
+        pts.push(new THREE.Vector3(Math.cos(a) * radius, 0, Math.sin(a) * radius));
+      }
+      const geo = new THREE.BufferGeometry().setFromPoints(pts);
+      const line = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: colorHex, transparent: true, opacity: 0.16 }));
+      parent.add(line);
+    }
+
+    // Build all 8 Planets + Moon
+    ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'].forEach(key => {
+      const cfg = SOLAR_BODIES[key];
+      addOrbitCircle(cfg.orbitDistScene);
+
+      const group = new THREE.Group();
+      scene.add(group);
+      planetGroups[key] = group;
+
+      let mesh;
+      if (key === 'earth') {
+        mesh = new THREE.Mesh(new THREE.SphereGeometry(cfg.sceneRadius, 128, 128), earthShaderMat);
+        mesh.rotation.z = THREE.MathUtils.degToRad(cfg.tiltDeg);
+        group.add(mesh);
+
+        // Earth Cloud Layer
+        const clouds = new THREE.Mesh(
+          new THREE.SphereGeometry(cfg.sceneRadius * 1.01, 96, 96),
+          new THREE.MeshStandardMaterial({
+            map: earthCloudsTex,
+            transparent: true,
+            opacity: 0.78,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+          })
+        );
+        mesh.add(clouds);
+        planetMeshes.earthClouds = clouds;
+
+        // Earth Rayleigh Outer Atmosphere Halo
+        const halo = new THREE.Mesh(
+          new THREE.SphereGeometry(cfg.sceneRadius * 1.055, 64, 64),
+          new THREE.MeshBasicMaterial({
+            color: 0x38bdf8,
+            transparent: true,
+            opacity: 0.16,
+            side: THREE.BackSide,
+            blending: THREE.AdditiveBlending
+          })
+        );
+        group.add(halo);
+
+        // Moon orbiting Earth
+        const moonCfg = SOLAR_BODIES.moon;
+        addOrbitCircle(moonCfg.orbitDistScene, 0x94a3b8, group);
+        const moonGroup = new THREE.Group();
+        group.add(moonGroup);
+        const mMesh = new THREE.Mesh(
+          new THREE.SphereGeometry(moonCfg.sceneRadius, 64, 64),
+          new THREE.MeshStandardMaterial({ map: moonTex, bumpMap: moonTex, bumpScale: 0.06, roughness: 0.9 })
+        );
+        moonGroup.add(mMesh);
+        planetGroups.moon = moonGroup;
+        planetMeshes.moon = mMesh;
+      } else {
+        const tex = generatePlanetTexture(key);
+        mesh = new THREE.Mesh(
+          new THREE.SphereGeometry(cfg.sceneRadius, 64, 64),
+          new THREE.MeshStandardMaterial({ map: tex, bumpMap: tex, bumpScale: 0.04, roughness: 0.82 })
+        );
+        mesh.rotation.z = THREE.MathUtils.degToRad(cfg.tiltDeg);
+        group.add(mesh);
+
+        // Add Saturn & Uranus Rings
+        if (key === 'saturn' || key === 'uranus') {
+          const innerR = cfg.sceneRadius * (key === 'saturn' ? 1.35 : 1.25);
+          const outerR = cfg.sceneRadius * (key === 'saturn' ? 2.35 : 1.65);
+          const ringGeo = new THREE.RingGeometry(innerR, outerR, 96);
+          ringGeo.rotateX(Math.PI / 2);
+          const ringMat = new THREE.MeshStandardMaterial({
+            color: key === 'saturn' ? 0xfde68a : 0x67e8f9,
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: key === 'saturn' ? 0.72 : 0.35,
+            roughness: 0.6
+          });
+          const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+          mesh.add(ringMesh);
+        }
+      }
+
+      planetMeshes[key] = mesh;
+    });
+
+    // 3D Location Pin Beacon on Earth
+    const pinGroup = new THREE.Group();
+    const pinHead = new THREE.Mesh(new THREE.OctahedronGeometry(0.16, 1), new THREE.MeshBasicMaterial({ color: 0xfbbf24 }));
+    pinHead.position.y = 0.42;
+    const pinStem = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.42, 8), new THREE.MeshBasicMaterial({ color: 0x38bdf8 }));
+    pinStem.position.y = 0.21;
+    const pinRing = new THREE.Mesh(new THREE.RingGeometry(0.14, 0.24, 24), new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide }));
+    pinRing.rotation.x = Math.PI / 2;
+    pinRing.position.y = 0.02;
+    pinGroup.add(pinHead, pinStem, pinRing);
+    pinGroup.visible = false;
+    planetMeshes.earth.add(pinGroup);
+
+    /* =========================================================================
+       5. REAL-TIME ASTRONOMICAL SUNLIGHT LOCK ON EARTH (EXACT UTC SUBSOLAR POINT)
+       ========================================================================= */
+    let useRealTimeSunlight = true;
+
+    function computeRealTimeEarthSunVector() {
+      const now = new Date();
+      // Day of year (1..365)
+      const start = new Date(Date.UTC(now.getUTCFullYear(), 0, 0));
+      const dayOfYear = Math.floor((now - start) / 86400000);
+
+      // Solar Declination (Axial tilt seasonal angle)
+      const declinationDeg = -23.44 * Math.cos(THREE.MathUtils.degToRad((360 / 365) * (dayOfYear + 10)));
+      // Subsolar Longitude from UTC hours, minutes, seconds
+      const utcHours = now.getUTCHours() + now.getUTCMinutes() / 60 + now.getUTCSeconds() / 3600;
+      const subsolarLonDeg = (12.0 - utcHours) * 15.0;
+
+      document.getElementById('utcClockTag').textContent =
+        `UTC ${now.toISOString().slice(11, 19)} • SUBSOLAR ${declinationDeg.toFixed(1)}°, ${subsolarLonDeg.toFixed(1)}°`;
+
+      // Convert subsolar Lat/Lon into Earth's local frame, then transform to World space
+      const localSun = latLonToVector(declinationDeg, subsolarLonDeg, 1.0);
+      localSun.applyMatrix3(new THREE.Matrix3().setFromMatrix4(planetMeshes.earth.matrixWorld)).normalize();
+      return localSun;
+    }
+
+    window.toggleRealTimeSun = function () {
+      useRealTimeSunlight = !useRealTimeSunlight;
+      const btn = document.getElementById('realSunBtn');
+      btn.classList.toggle('active', useRealTimeSunlight);
+      btn.textContent = useRealTimeSunlight ? '🕒 Live Real-World Sun: ON' : '🕒 Live Real-World Sun: ORBITAL';
+    };
+
+    /* =========================================================================
+       6. CAMERA CONTROLLER, PLANET SWITCHING & LAT/LON GEOCODING
+       ========================================================================= */
+    let activeBody = 'earth';
+    let camYaw = 0.6;
+    let camPitch = 0.35;
+    let camDist = 18.0;
+    let targetCamYaw = 0.6;
+    let targetCamPitch = 0.35;
+    let targetCamDist = 18.0;
+
+    let currentInspection = {
+      type: 'place',
+      bodyKey: 'earth',
+      name: 'New Delhi, India',
+      lat: 28.6139,
+      lon: 77.2090,
+      weather: null,
+      wikiSummary: ''
+    };
+
+    function latLonToVector(lat, lon, radius) {
+      const phi = THREE.MathUtils.degToRad(90 - lat);
+      const theta = THREE.MathUtils.degToRad(lon + 180);
+      return new THREE.Vector3(
+        -radius * Math.sin(phi) * Math.cos(theta),
+        radius * Math.cos(phi),
+        radius * Math.sin(phi) * Math.sin(theta)
+      );
+    }
+
+    function placePinOnEarth(lat, lon) {
+      const p = latLonToVector(lat, lon, SOLAR_BODIES.earth.sceneRadius);
+      pinGroup.position.copy(p);
+      pinGroup.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), p.clone().normalize());
+      pinGroup.visible = true;
+    }
+
+    window.selectCelestialBody = function (key) {
+      activeBody = key;
+      const cfg = SOLAR_BODIES[key];
+      document.getElementById('activeBodyTag').textContent = `${cfg.name.toUpperCase()} (${cfg.orbitalSpeedKms} km/s)`;
+
+      document.querySelectorAll('.planet-chip').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent.toLowerCase().includes(key));
+      });
+
+      const minZoom = cfg.sceneRadius * 1.16;
+      const defaultZoom = cfg.sceneRadius * 3.1;
+      const slZoom = document.getElementById('slZoom');
+      slZoom.min = minZoom.toFixed(2);
+      targetCamDist = defaultZoom;
+      slZoom.value = defaultZoom;
+
+      currentInspection = {
+        type: 'planet',
+        bodyKey: key,
+        name: cfg.name,
+        lat: 0,
+        lon: 0,
+        weather: null,
+        wikiSummary: cfg.summary
+      };
+
+      populatePlanetExploreCard(key);
+    };
+
+    /* =========================================================================
+       7. LIVE WEATHER (OPEN-METEO) + WIKIPEDIA DEEP-DIVE + FOLLOW-UP AI ASSISTANT
+       ========================================================================= */
+    const WMO_CODES = {
+      0: 'Clear Sky ☀️', 1: 'Mainly Clear 🌤️', 2: 'Partly Cloudy ⛅', 3: 'Overcast ☁️',
+      45: 'Foggy 🌫️', 51: 'Light Drizzle 🌦️', 61: 'Rain 🌧️', 71: 'Snowfall ❄️',
+      80: 'Rain Showers 🌦️', 95: 'Thunderstorm ⛈️'
+    };
+
+    let voiceReadoutEnabled = true;
+    window.toggleVoiceReadout = function () {
+      voiceReadoutEnabled = !voiceReadoutEnabled;
+      const btn = document.getElementById('ttsBtn');
+      btn.textContent = voiceReadoutEnabled ? '🔊 AI Voice: ON' : '🔇 AI Voice: OFF';
+      if (!voiceReadoutEnabled && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+    };
+
+    function speakText(text) {
+      if (!voiceReadoutEnabled || !('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.rate = 1.03;
+      utter.pitch = 1.0;
+      window.speechSynthesis.speak(utter);
+    }
+
+    function appendAIMessage(role, htmlText) {
+      const thread = document.getElementById('aiThread');
+      const div = document.createElement('div');
+      div.className = `ai-msg ${role}`;
+      div.innerHTML = htmlText;
+      thread.appendChild(div);
+      const scroll = document.getElementById('drawerScroll');
+      scroll.scrollTop = scroll.scrollHeight;
+    }
+
+    function populatePlanetExploreCard(key) {
+      const cfg = SOLAR_BODIES[key];
+      document.getElementById('exploreTitle').textContent = cfg.name;
+      document.getElementById('exploreCoords').textContent = `${cfg.subtitle} • Dist: ${cfg.distanceAU}`;
+
+      document.getElementById('metaLabel1').textContent = 'Exact Orbital Speed';
+      document.getElementById('metaVal1').textContent = `${cfg.orbitalSpeedKms} km/s`;
+
+      document.getElementById('metaLabel2').textContent = 'Surface Gravity';
+      document.getElementById('metaVal2').textContent = cfg.gravity;
+
+      document.getElementById('metaLabel3').textContent = 'Equatorial Radius';
+      document.getElementById('metaVal3').textContent = `${cfg.radiusKm.toLocaleString()} km`;
+
+      document.getElementById('metaLabel4').textContent = 'Sidereal Day / Tilt';
+      document.getElementById('metaVal4').textContent = `${Math.abs(cfg.rotationPeriodHrs)}h | ${cfg.tiltDeg}°`;
+
+      document.getElementById('satBox').style.display = key === 'earth' ? 'block' : 'none';
+
+      const thread = document.getElementById('aiThread');
+      thread.innerHTML = '';
+      appendAIMessage(
+        'assistant',
+        `<b>${cfg.name} Telemetry Locked:</b> ${cfg.summary}<br/><br/>` +
+        `• <b>Atmosphere:</b> ${cfg.atmosphere}<br/>` +
+        `• <b>Mean Orbital Speed:</b> ${cfg.orbitalSpeedKms} km/s`
+      );
+    }
+
+    async function inspectEarthLocation(lat, lon, customLabel = null) {
+      if (activeBody !== 'earth') selectCelestialBody('earth');
+      placePinOnEarth(lat, lon);
+
+      const latStr = lat.toFixed(4);
+      const lonStr = lon.toFixed(4);
+      const ns = lat >= 0 ? 'N' : 'S';
+      const ew = lon >= 0 ? 'E' : 'W';
+
+      document.getElementById('satBox').style.display = 'block';
+      document.getElementById('sat-iframe').src = `https://maps.google.com/maps?q=${latStr},${lonStr}&t=k&z=15&output=embed`;
+      document.getElementById('extGoogleEarth').href = `https://earth.google.com/web/@${latStr},${lonStr},250a,3000d,35y,0h,45t,0r`;
+      document.getElementById('extStreetView').href = `https://www.google.com/maps?q=${latStr},${lonStr}&t=k`;
+
+      document.getElementById('exploreCoords').textContent = `LAT: ${Math.abs(lat).toFixed(4)}° ${ns}, LON: ${Math.abs(lon).toFixed(4)}° ${ew}`;
+      document.getElementById('exploreTitle').textContent = customLabel || 'Locating Place...';
+
+      const thread = document.getElementById('aiThread');
+      thread.innerHTML = '';
+      openExploreDrawer();
+
+      // 1. Reverse Geocode if no customLabel
+      let placeName = customLabel;
+      if (!placeName) {
+        try {
+          const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latStr}&lon=${lonStr}&zoom=10`, {
+            headers: { 'Accept-Language': 'en' }
+          });
+          const d = await r.json();
+          placeName = d.display_name || `${lat.toFixed(2)}° ${ns}, ${lon.toFixed(2)}° ${ew}`;
+        } catch (e) {
+          placeName = `${lat.toFixed(2)}° ${ns}, ${lon.toFixed(2)}° ${ew}`;
+        }
+      }
+      document.getElementById('exploreTitle').textContent = placeName;
+
+      // 2. Fetch Real-Time Live Weather from Open-Meteo
+      let weatherText = 'Unavailable';
+      let weatherObj = null;
+      try {
+        const wRes = await fetch(
+          `https://api.open-meteo.com/v1/forecast?latitude=${latStr}&longitude=${lonStr}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,cloud_cover,surface_pressure,is_day`
+        );
+        const wData = await wRes.json();
+        if (wData && wData.current) {
+          weatherObj = wData.current;
+          const cond = WMO_CODES[weatherObj.weather_code] || 'Clear / Variable';
+          weatherText = `${weatherObj.temperature_2m}°C • ${cond}`;
+
+          document.getElementById('metaLabel1').textContent = 'Live Temperature';
+          document.getElementById('metaVal1').textContent = `${weatherObj.temperature_2m} °C (${weatherObj.is_day ? 'Day' : 'Night'})`;
+
+          document.getElementById('metaLabel2').textContent = 'Sky Condition';
+          document.getElementById('metaVal2').textContent = cond;
+
+          document.getElementById('metaLabel3').textContent = 'Wind & Humidity';
+          document.getElementById('metaVal3').textContent = `${weatherObj.wind_speed_10m} km/h | ${weatherObj.relative_humidity_2m}%`;
+
+          document.getElementById('metaLabel4').textContent = 'Cloud Cover / Press';
+          document.getElementById('metaVal4').textContent = `${weatherObj.cloud_cover}% | ${Math.round(weatherObj.surface_pressure)} hPa`;
+        }
+      } catch (e) {}
+
+      // 3. Fetch Wikipedia Encyclopedic Summary for the Place
+      const shortQuery = placeName.split(',')[0].trim();
+      let wikiExtract = '';
+      try {
+        const sRes = await fetch(
+          `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(shortQuery)}&utf8=&format=json&origin=*`
+        );
+        const sData = await sRes.json();
+        if (sData?.query?.search?.length > 0) {
+          const topTitle = sData.query.search[0].title;
+          const sumRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topTitle)}`);
+          const sumData = await sumRes.json();
+          if (sumData && sumData.extract) wikiExtract = sumData.extract;
+        }
+      } catch (e) {}
+
+      if (!wikiExtract) {
+        wikiExtract = `${placeName} is located at ${Math.abs(lat).toFixed(3)}° ${ns}, ${Math.abs(lon).toFixed(3)}° ${ew} on Earth.`;
+      }
+
+      currentInspection = {
+        type: 'place',
+        bodyKey: 'earth',
+        name: placeName,
+        lat,
+        lon,
+        weather: weatherObj,
+        wikiSummary: wikiExtract
+      };
+
+      const msgHtml =
+        `<b>📍 ${placeName}</b><br/>` +
+        `${wikiExtract}<br/><br/>` +
+        (weatherObj
+          ? `<b>🌡️ Real-Time Local Weather:</b> ${weatherText}, Wind ${weatherObj.wind_speed_10m} km/h, Humidity ${weatherObj.relative_humidity_2m}%, Cloud Cover ${weatherObj.cloud_cover}%.`
+          : '');
+
+      appendAIMessage('assistant', msgHtml);
+      speakText(`${shortQuery}. ${wikiExtract.split('.').slice(0, 2).join('.')}. Current temperature is ${weatherObj ? weatherObj.temperature_2m + ' degrees Celsius' : 'nominal'}.`);
+    }
+
+    // Fly Smoothly to Any Place or Planet by Name (Used by Voice Assistant & Search Bar)
+    window.flyToPlaceByName = async function (rawQuery) {
+      const q = rawQuery.trim();
+      if (!q) return;
+
+      // Check if user named a planet or the Sun/Moon
+      const lower = q.toLowerCase();
+      for (const key of Object.keys(SOLAR_BODIES)) {
+        if (lower === key || lower.includes(key)) {
+          selectCelestialBody(key);
+          openExploreDrawer();
+          speakText(`Navigating to ${SOLAR_BODIES[key].name}. ${SOLAR_BODIES[key].summary}`);
+          return;
+        }
+      }
+
+      showToast(`🛰️ Locating "${q}" on Earth...`);
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=1`, {
+          headers: { 'Accept-Language': 'en' }
+        });
+        const arr = await res.json();
+        if (arr && arr.length > 0) {
+          const lat = parseFloat(arr[0].lat);
+          const lon = parseFloat(arr[0].lon);
+          const display = arr[0].display_name;
+
+          selectCelestialBody('earth');
+          // Orient camera directly above the target Lat/Lon on Earth
+          const localVec = latLonToVector(lat, lon, 1.0);
+          const rotY = planetMeshes.earth.rotation.y;
+          localVec.applyAxisAngle(new THREE.Vector3(0, 1, 0), rotY);
+          localVec.applyAxisAngle(new THREE.Vector3(0, 0, 1), THREE.MathUtils.degToRad(23.44));
+
+          targetCamPitch = Math.asin(Math.max(-0.98, Math.min(0.98, localVec.y)));
+          targetCamYaw = Math.atan2(localVec.x, localVec.z);
+          targetCamDist = 9.4;
+          document.getElementById('slZoom').value = targetCamDist;
+
+          await inspectEarthLocation(lat, lon, display);
+        } else {
+          showToast(`⚠️ Could not find "${q}". Try another city, landmark, or planet.`);
+        }
+      } catch (e) {
+        showToast(`⚠️ Network lookup error for "${q}".`);
+      }
+    };
+
+    window.runPlaceOrPlanetSearch = function () {
+      const val = document.getElementById('placeSearchInput').value;
+      flyToPlaceByName(val);
+    };
+    document.getElementById('placeSearchInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') runPlaceOrPlanetSearch();
+    });
+
+    // Follow-Up Q&A Engine inside the Sideways AI Drawer
+    window.askFollowUp = async function (question) {
+      if (!question.trim()) return;
+      appendAIMessage('user', question);
+
+      const qLow = question.toLowerCase();
+      const info = currentInspection;
+      const cfg = SOLAR_BODIES[info.bodyKey];
+
+      let reply = '';
+      if (qLow.includes('weather') || qLow.includes('temp') || qLow.includes('wind') || qLow.includes('rain')) {
+        if (info.weather) {
+          const w = info.weather;
+          const cond = WMO_CODES[w.weather_code] || 'Clear';
+          reply = `Right now at <b>${info.name.split(',')[0]}</b>, the live temperature is <b>${w.temperature_2m}°C</b> (${cond}), wind speed is <b>${w.wind_speed_10m} km/h</b>, relative humidity is <b>${w.relative_humidity_2m}%</b>, cloud cover is <b>${w.cloud_cover}%</b>, and surface pressure is <b>${w.surface_pressure} hPa</b>.`;
+        } else {
+          reply = `On <b>${cfg.name}</b>, atmospheric composition is <b>${cfg.atmosphere}</b> with surface gravity of <b>${cfg.gravity}</b>.`;
+        }
+      } else if (qLow.includes('speed') || qLow.includes('orbit') || qLow.includes('size') || qLow.includes('radius') || qLow.includes('physical')) {
+        reply = `<b>${cfg.name} Physical & Orbital Specs:</b><br/>• Mean Orbital Speed: <b>${cfg.orbitalSpeedKms} km/s</b><br/>• Equatorial Radius: <b>${cfg.radiusKm.toLocaleString()} km</b><br/>• Distance: <b>${cfg.distanceAU}</b><br/>• Sidereal Rotation Period: <b>${Math.abs(cfg.rotationPeriodHrs)} hours</b><br/>• Axial Tilt: <b>${cfg.tiltDeg}°</b><br/>• Gravity: <b>${cfg.gravity}</b>`;
+      } else {
+        // Query Wikipedia API dynamically for custom follow-up questions!
+        try {
+          const searchTopic = `${info.name.split(',')[0]} ${question}`;
+          const r = await fetch(
+            `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(searchTopic)}&utf8=&format=json&origin=*`
+          );
+          const d = await r.json();
+          if (d?.query?.search?.length > 0) {
+            const topTitle = d.query.search[0].title;
+            const sr = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topTitle)}`);
+            const sd = await sr.json();
+            if (sd && sd.extract) {
+              reply = `<b>${sd.title}:</b> ${sd.extract}`;
+            }
+          }
+        } catch (e) {}
+
+        if (!reply) {
+          reply = `${info.wikiSummary} (Coordinates: ${info.lat.toFixed(3)}°, ${info.lon.toFixed(3)}° on ${cfg.name}).`;
+        }
+      }
+
+      appendAIMessage('assistant', reply);
+      speakText(reply.replace(/<[^>]*>?/gm, ''));
+    };
+
+    window.submitFollowUpInput = function () {
+      const inp = document.getElementById('followUpInput');
+      const val = inp.value;
+      inp.value = '';
+      askFollowUp(val);
+    };
+    document.getElementById('followUpInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') submitFollowUpInput();
+    });
+
+    window.openExploreDrawer = function () {
+      document.getElementById('ai-drawer').classList.add('open');
+      if (document.getElementById('aiThread').children.length === 0) {
+        populatePlanetExploreCard(activeBody);
+      }
+    };
+    window.closeExploreDrawer = function () {
+      document.getElementById('ai-drawer').classList.remove('open');
+    };
+
+    /* =========================================================================
+       8. WEB SPEECH API VOICE ASSISTANT (NAVIGATION + FOLLOW-UP VOICE)
+       ========================================================================= */
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    window.triggerVoiceNavigation = function () {
+      if (!SpeechRec) {
+        showToast('⚠️ Web Speech Recognition requires Chrome or Edge.');
+        return;
+      }
+      const btn = document.getElementById('voiceNavBtn');
+      const rec = new SpeechRec();
+      rec.lang = 'en-US';
+      rec.interimResults = false;
+
+      btn.classList.add('listening');
+      btn.textContent = '🎙️ Listening...';
+      showToast('🎙️ Speak any city, landmark, or planet (e.g., "Paris", "Ambala", "Saturn")...');
+
+      rec.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        // Strip conversational filler like "take me to" or "go to"
+        const cleaned = transcript.replace(/^(take me to|fly to|go to|show me|explore|visit)\s+/i, '').trim();
+        document.getElementById('placeSearchInput').value = cleaned;
+        flyToPlaceByName(cleaned);
+      };
+      rec.onerror = () => showToast('⚠️ Could not hear clearly. Try again.');
+      rec.onend = () => {
+        btn.classList.remove('listening');
+        btn.textContent = '🎙️ Voice Assist';
+      };
+      rec.start();
+    };
+
+    window.triggerFollowUpVoice = function () {
+      if (!SpeechRec) {
+        showToast('⚠️ Web Speech Recognition requires Chrome or Edge.');
+        return;
+      }
+      const rec = new SpeechRec();
+      rec.lang = 'en-US';
+      showToast('🎙️ Ask your follow-up question now...');
+      rec.onresult = (e) => {
+        const text = e.results[0][0].transcript;
+        document.getElementById('followUpInput').value = text;
+        submitFollowUpInput();
+      };
+      rec.start();
+    };
+
+    /* =========================================================================
+       9. MOUSE RAYCASTING & BUTTER-SMOOTH CAMERA DAMPING
+       ========================================================================= */
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+    let isDragging = false;
+    let downPos = { x: 0, y: 0 };
+    let prevPos = { x: 0, y: 0 };
+
+    renderer.domElement.addEventListener('pointerdown', (e) => {
+      isDragging = true;
+      downPos = { x: e.clientX, y: e.clientY };
+      prevPos = { x: e.clientX, y: e.clientY };
+    });
+
+    renderer.domElement.addEventListener('pointermove', (e) => {
+      if (!isDragging) return;
+      const dx = e.clientX - prevPos.x;
+      const dy = e.clientY - prevPos.y;
+      // Scale angular sensitivity by zoom depth so close-up inspection is ultra-smooth!
+      const zoomScale = Math.max(0.18, Math.min(1.0, (camDist - 5.5) / 18.0));
+      targetCamYaw -= dx * 0.005 * zoomScale;
+      targetCamPitch = Math.max(-1.45, Math.min(1.45, targetCamPitch + dy * 0.005 * zoomScale));
+      prevPos = { x: e.clientX, y: e.clientY };
+    });
+
+    window.addEventListener('pointerup', (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      if (Math.hypot(e.clientX - downPos.x, e.clientY - downPos.y) < 6) {
+        pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
+        pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(pointer, camera);
+
+        const meshList = Object.values(planetMeshes).filter(m => m !== planetMeshes.earthClouds);
+        const hits = raycaster.intersectObjects(meshList);
+        if (hits.length > 0) {
+          const hit = hits[0];
+          if (hit.object === planetMeshes.earth && hit.uv) {
+            const lon = (hit.uv.x - 0.5) * 360.0;
+            const lat = (hit.uv.y - 0.5) * 180.0;
+            inspectEarthLocation(lat, lon);
+          } else {
+            const foundKey = Object.keys(planetMeshes).find(k => planetMeshes[k] === hit.object);
+            if (foundKey) {
+              selectCelestialBody(foundKey);
+              openExploreDrawer();
+            }
+          }
+        }
+      }
+    });
+
+    window.addEventListener('wheel', (e) => {
+      const cfg = SOLAR_BODIES[activeBody];
+      const minD = cfg.sceneRadius * 1.14;
+      const maxD = 320.0;
+      targetCamDist = Math.max(minD, Math.min(maxD, targetCamDist + e.deltaY * 0.012));
+      document.getElementById('slZoom').value = targetCamDist;
+    });
+
+    // Bottom Sliders
+    document.getElementById('slZoom').addEventListener('input', (e) => {
+      targetCamDist = parseFloat(e.target.value);
+    });
+    document.getElementById('slSharp').addEventListener('input', (e) => {
+      const v = parseFloat(e.target.value);
+      earthUniforms.uDetailStrength.value = v;
+      document.getElementById('lblSharp').textContent = v.toFixed(2) + 'x';
+    });
+
+    let timeScale = 1.0;
+    document.getElementById('slSpeed').addEventListener('input', (e) => {
+      timeScale = parseFloat(e.target.value);
+      document.getElementById('lblSpeed').textContent = timeScale.toFixed(1) + 'x';
+    });
+
+    let toastTimeout = null;
+    function showToast(msg) {
+      const t = document.getElementById('toast-banner');
+      t.textContent = msg;
+      t.style.opacity = '1';
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => (t.style.opacity = '0'), 3200);
+    }
+
+    /* =========================================================================
+       10. MEDIAPIPE WEBCAM HAND-TRACKING (PINCH BACK, SPREAD ZOOM, PALM ORBIT)
+       ========================================================================= */
+    let handActive = false;
+    let mpHands = null;
+    let mpCam = null;
+    let prevPalm = null;
+    const videoEl = document.getElementById('webcam-video');
+    const handCanvas = document.getElementById('hand-canvas');
+    const handCtx = handCanvas.getContext('2d');
+
+    const BONES = [
+      [0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],
+      [5,9],[9,10],[10,11],[11,12],[9,13],[13,14],[14,15],[15,16],
+      [13,17],[0,17],[17,18],[18,19],[19,20]
+    ];
+
+    function onHandResults(res) {
+      handCtx.clearRect(0, 0, handCanvas.width, handCanvas.height);
+      handCtx.drawImage(res.image, 0, 0, handCanvas.width, handCanvas.height);
+
+      if (res.multiHandLandmarks && res.multiHandLandmarks.length > 0) {
+        const lm = res.multiHandLandmarks[0];
+        handCtx.strokeStyle = '#10b981';
+        handCtx.lineWidth = 2;
+        BONES.forEach(([a, b]) => {
+          handCtx.beginPath();
+          handCtx.moveTo(lm[a].x * handCanvas.width, lm[a].y * handCanvas.height);
+          handCtx.lineTo(lm[b].x * handCanvas.width, lm[b].y * handCanvas.height);
+          handCtx.stroke();
+        });
+
+        const pinch = Math.hypot(lm[4].x - lm[8].x, lm[4].y - lm[8].y);
+        const minD = SOLAR_BODIES[activeBody].sceneRadius * 1.15;
+        let status = 'ORBIT';
+        if (pinch < 0.055) {
+          targetCamDist = Math.min(180, targetCamDist + 0.35);
+          status = 'PINCH BACK (ZOOM OUT)';
+        } else if (pinch > 0.16) {
+          targetCamDist = Math.max(minD, targetCamDist - 0.35);
+          status = 'SPREAD (ZOOM IN)';
+        }
+        document.getElementById('slZoom').value = targetCamDist;
+
+        const px = 1.0 - lm[9].x;
+        const py = lm[9].y;
+        if (prevPalm) {
+          const dx = px - prevPalm.x;
+          const dy = py - prevPalm.y;
+          if (Math.hypot(dx, dy) < 0.14) {
+            targetCamYaw -= dx * 3.0;
+            targetCamPitch = Math.max(-1.4, Math.min(1.4, targetCamPitch + dy * 2.4));
+          }
+        }
+        prevPalm = { x: px, y: py };
+        document.getElementById('handGestureBadge').textContent = status;
+      } else {
+        prevPalm = null;
+      }
+    }
+
+    window.toggleHandGestures = async function () {
+      const btn = document.getElementById('handBtn');
+      const pip = document.getElementById('hand-pip');
+      if (!handActive) {
+        btn.textContent = '⏳ Starting...';
+        try {
+          if (!mpHands) {
+            mpHands = new Hands({ locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}` });
+            mpHands.setOptions({ maxNumHands: 2, modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.6 });
+            mpHands.onResults(onHandResults);
+          }
+          if (!mpCam) {
+            mpCam = new Camera(videoEl, {
+              onFrame: async () => { if (handActive) await mpHands.send({ image: videoEl }); },
+              width: 320, height: 220
+            });
+          }
+          await mpCam.start();
+          handActive = true;
+          pip.classList.add('open');
+          btn.classList.add('active');
+          btn.textContent = '🖐️ Hand Control: ON';
+        } catch (e) {
+          btn.textContent = '⚠️ Camera Blocked';
+        }
+      } else {
+        handActive = false;
+        if (mpCam) mpCam.stop();
+        pip.classList.remove('open');
+        btn.classList.remove('active');
+        btn.textContent = '🖐️ Hand Control';
+      }
+    };
+
+    /* =========================================================================
+       11. MASTER 60-FPS SIMULATION & SMOOTH INTERPOLATION LOOP
+       ========================================================================= */
+    let lastFrameTime = performance.now();
+
+    function animate(now) {
+      requestAnimationFrame(animate);
+      const dt = Math.min(0.05, (now - lastFrameTime) / 1000);
+      lastFrameTime = now;
+
+      sunUniforms.uTime.value = now * 0.001;
+
+      // 1. Update All 8 Planets' Orbital Positions & Sidereal Spins
+      ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'].forEach(key => {
+        const cfg = SOLAR_BODIES[key];
+        orbitalAngles[key] += cfg.angularSpeed * timeScale * dt * 12;
+        const r = cfg.orbitDistScene;
+        planetGroups[key].position.set(
+          Math.cos(orbitalAngles[key]) * r,
+          0,
+          Math.sin(orbitalAngles[key]) * r
+        );
+
+        // Sidereal spin around axis
+        const spinDir = cfg.rotationPeriodHrs < 0 ? -1 : 1;
+        const spinRate = (24 / Math.abs(cfg.rotationPeriodHrs)) * 0.004 * timeScale;
+        planetMeshes[key].rotation.y += spinDir * spinRate;
+      });
+
+      // Cloud drift on Earth
+      if (planetMeshes.earthClouds) {
+        planetMeshes.earthClouds.rotation.y += 0.00035 * timeScale;
+      }
+
+      // Moon revolution around Earth (Tidally Locked)
+      orbitalAngles.moon += SOLAR_BODIES.moon.angularSpeed * timeScale * dt * 15;
+      const mr = SOLAR_BODIES.moon.orbitDistScene;
+      planetGroups.moon.position.set(
+        Math.cos(orbitalAngles.moon) * mr,
+        Math.sin(orbitalAngles.moon * 0.5) * 1.4,
+        Math.sin(orbitalAngles.moon) * mr
+      );
+      planetMeshes.moon.rotation.y = -orbitalAngles.moon + Math.PI;
+
+      // 2. Update Earth's Sun Illumination Vector (Live Real-World UTC vs Orbital Sun)
+      if (useRealTimeSunlight) {
+        earthUniforms.uSunDir.value.copy(computeRealTimeEarthSunVector());
+      } else {
+        const earthWorld = new THREE.Vector3();
+        planetGroups.earth.getWorldPosition(earthWorld);
+        earthUniforms.uSunDir.value.copy(earthWorld).negate().normalize();
+        document.getElementById('utcClockTag').textContent = 'ORBITAL HELIOCENTRIC SUNLIGHT';
+      }
+
+      // Pulse 3D Beacon Pin on Earth
+      if (pinGroup.visible) {
+        const s = 1 + Math.sin(now * 0.008) * 0.25;
+        pinRing.scale.set(s, s, 1);
+      }
+
+      // 3. Frame-Rate Independent Exponential Camera Smoothing
+      const smoothFactor = 1.0 - Math.exp(-dt * 9.5);
+      camYaw += (targetCamYaw - camYaw) * smoothFactor;
+      camPitch += (targetCamPitch - camPitch) * smoothFactor;
+      camDist += (targetCamDist - camDist) * smoothFactor;
+
+      earthUniforms.uCamDist.value = camDist;
+      document.getElementById('lblZoom').textContent = `${camDist.toFixed(1)} u`;
+
+      const targetCenter = new THREE.Vector3();
+      planetMeshes[activeBody].getWorldPosition(targetCenter);
+
+      camera.position.x = targetCenter.x + Math.sin(camYaw) * Math.cos(camPitch) * camDist;
+      camera.position.y = targetCenter.y + Math.sin(camPitch) * camDist;
+      camera.position.z = targetCenter.z + Math.cos(camYaw) * Math.cos(camPitch) * camDist;
+      camera.lookAt(targetCenter);
+
+      renderer.render(scene, camera);
+    }
+
+    // Boot scene focused on Earth with Explore Panel ready
+    populatePlanetExploreCard('earth');
+    requestAnimationFrame(animate);
+  </script>
+</body>
+</html>
